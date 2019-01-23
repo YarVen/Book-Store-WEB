@@ -13,7 +13,7 @@ using WebUI.Models;
 namespace UnitTests
 {
     [TestClass]
-    public class BookUnitTest
+    public class BookTests
     {
         [TestMethod]
         public void Can_Paginate()

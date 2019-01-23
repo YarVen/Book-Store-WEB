@@ -98,8 +98,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\NinjectWebCommon.cs" />
-    <Compile Include="BookUnitTest.cs" />
+    <Compile Include="BookTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CartTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
