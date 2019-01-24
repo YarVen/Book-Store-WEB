@@ -1,7 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Web.Mvc;
+using Domain.Abstract;
 using Domain.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using WebUI.Controllers;
+using WebUI.Models;
 
 namespace UnitTests
 {
@@ -92,6 +97,56 @@ namespace UnitTests
             cart.Clear();
 
             Assert.AreEqual(cart.Lines.Count(), 0);
+        }
+
+        //Добавление элемента в корзину
+        [TestMethod]
+        public void Can_Add_To_Cart()
+        {
+            Mock<IBookRepository> mock = new Mock<IBookRepository>();
+            mock.Setup(m => m.Books).Returns(new List<Book>
+            {
+                new Book{BookId = 1, Name = "Book1", Genre = "Genre1"}
+            }.AsQueryable());
+
+            Cart cart = new Cart();
+            CartController controller = new CartController(mock.Object);
+
+            controller.AddToCart(cart, 1, null);
+
+            Assert.AreEqual(cart.Lines.Count(), 1);
+            Assert.AreEqual(cart.Lines.ToList()[0].Book.BookId, 1);
+        }
+
+        //После добавления книги в корзину - перенаправление на страницу корзины
+        [TestMethod]
+        public void Adding_Book_To_Cart_Goes_To_Cart_Screen()
+        {
+            Mock<IBookRepository> mock = new Mock<IBookRepository>();
+            mock.Setup(m => m.Books).Returns(new List<Book>
+            {
+                new Book{BookId = 1, Name = "Book1", Genre = "Genre1"}
+            }.AsQueryable());
+
+            Cart cart = new Cart();
+            CartController controller = new CartController(mock.Object);
+
+            RedirectToRouteResult result = controller.AddToCart(cart, 2, "myUrl");
+
+            Assert.AreEqual(result.RouteValues["action"], "Index");
+            Assert.AreEqual(result.RouteValues["returnUrl"], "myUrl");
+        }
+
+        [TestMethod]
+        public void Can_View_Cart_Contents()
+        {
+            Cart cart = new Cart();
+            CartController target = new CartController(null);
+
+            CartIndexViewModel result = (CartIndexViewModel) target.Index(cart, "myUrl").ViewData.Model;
+
+            Assert.AreSame(result.Cart, cart);
+            Assert.AreEqual(result.ReturnUrl, "myUrl");
         }
     }
 }
